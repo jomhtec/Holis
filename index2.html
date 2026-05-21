@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Una pregunta</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+    body {
+      background: #f0ebe3;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow: hidden;
+      color: #3a3028;
+    }
+ 
+    /* ── PANTALLA PRINCIPAL ── */
+    #pantalla-principal {
+      text-align: center;
+      animation: fadeIn 1s ease both;
+    }
+ 
+    .mensaje {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+      font-weight: 300;
+      color: #3a3028;
+      line-height: 1.6;
+      margin-bottom: 3rem;
+      letter-spacing: 0.01em;
+    }
+ 
+    .mensaje span { font-style: italic; color: #7a6455; }
+ 
+    .cuenta-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #a89a8a;
+      margin-bottom: 1rem;
+      display: block;
+    }
+ 
+    #numero {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(6rem, 14vw, 11rem);
+      font-weight: 300;
+      color: #7a6455;
+      line-height: 1;
+      transition: transform 0.12s ease, opacity 0.12s ease;
+    }
+ 
+    #numero.pulso { transform: scale(1.12); opacity: 0.45; }
+ 
+    /* ── OVERLAY ── */
+    #overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(58,48,40,0.1);
+      backdrop-filter: blur(3px);
+      z-index: 50;
+    }
+ 
+    /* ── VENTANA ── */
+    #ventana {
+      display: none;
+      position: fixed;
+      width: 360px;
+      background: #f2ede6;
+      border: 1px solid #c4b8a8;
+      border-radius: 6px 6px 4px 4px;
+      box-shadow:
+        0 10px 40px rgba(58,48,40,0.16),
+        0 2px 8px rgba(58,48,40,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.55);
+      z-index: 100;
+    }
+ 
+    .win-titlebar {
+      background: linear-gradient(to bottom, #8a7868, #6e5e50);
+      padding: 0.45rem 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 5px 5px 0 0;
+    }
+ 
+    .win-title {
+      color: #f0ebe3;
+      font-size: 0.73rem;
+      font-weight: 300;
+      font-family: 'DM Sans', sans-serif;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+ 
+    .win-dots { display: flex; gap: 0.38rem; }
+    .win-dot {
+      width: 11px; height: 11px; border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.12);
+    }
+    .win-dot.rojo  { background: #d97060; }
+    .win-dot.ambar { background: #d4a040; }
+    .win-dot.verde { background: #70b870; }
+ 
+    .win-body {
+      padding: 2.2rem 2rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.1rem;
+    }
+ 
+    .win-linea { width: 36px; height: 1px; background: #c8baa8; }
+ 
+    .win-mensaje {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 300;
+      color: #3a3028;
+      text-align: center;
+      line-height: 1.5;
+    }
+ 
+    .win-botones {
+      display: flex;
+      gap: 0.7rem;
+      width: 100%;
+      margin-top: 0.3rem;
+    }
+ 
+    /* Ambos botones igual color */
+    .win-btn {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background 0.18s;
+      border: 1px solid #b4a898;
+      background: #7a6455;
+      color: #f5f0ea;
+    }
+ 
+    .win-btn:hover { background: #695447; }
+    .win-btn:active { transform: translateY(1px); }
+ 
+    /* ── CELEBRACIÓN ── */
+    #celebracion {
+      display: none;
+      position: fixed; inset: 0;
+      background: #f0ebe3;
+      z-index: 200;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+ 
+    .celeb-titulo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 5vw, 3.8rem);
+      font-weight: 300;
+      color: #3a3028;
+      line-height: 1.3;
+      margin-bottom: 0.8rem;
+      animation: fadeUp 0.9s ease both 0.2s;
+      opacity: 0;
+    }
+ 
+    .celeb-titulo em { font-style: italic; color: #9a7060; }
+ 
+    .celeb-sub {
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #b4a898;
+      animation: fadeUp 0.9s ease both 0.5s;
+      opacity: 0;
+      margin-bottom: 2rem;
+    }
+ 
+    .celeb-fecha {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-style: italic;
+      color: #9a8a7a;
+      animation: fadeUp 0.9s ease both 0.8s;
+      opacity: 0;
+      border-top: 1px solid #d4c8b8;
+      padding-top: 1.2rem;
+    }
+ 
+    /* ── TULIPANES ── */
+    .tulipan {
+      position: fixed;
+      pointer-events: none;
+      animation: caer linear forwards;
+      z-index: 300;
+    }
+ 
+    @keyframes caer {
+      0%   { transform: translateY(-60px) rotate(0deg); opacity: 1; }
+      85%  { opacity: 1; }
+      100% { transform: translateY(108vh) rotate(500deg); opacity: 0; }
+    }
+ 
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes entrada {
+      from { transform: scale(0.82) translateY(8px); opacity: 0; }
+      to   { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    .ventana-show { animation: entrada 0.32s cubic-bezier(0.34,1.4,0.64,1) both; }
+  </style>
+</head>
+<body>
+ 
+<!-- PANTALLA PRINCIPAL -->
+<div id="pantalla-principal">
+  <p class="mensaje">
+    Hola <span>Vale</span>,<br>te quiero realizar una pregunta.
+  </p>
+  <span class="cuenta-label">la pregunta llega en</span>
+  <div id="numero">10</div>
+</div>
+ 
+<!-- OVERLAY -->
+<div id="overlay"></div>
+ 
+<!-- VENTANA -->
+<div id="ventana">
+  <div class="win-titlebar">
+    <span class="win-title">Mensaje</span>
+    <div class="win-dots">
+      <div class="win-dot rojo"></div>
+      <div class="win-dot ambar"></div>
+      <div class="win-dot verde"></div>
+    </div>
+  </div>
+  <div class="win-body">
+    <div class="win-linea"></div>
+    <p class="win-mensaje">¿Quieres ser mi enamorada?</p>
+    <div class="win-botones">
+      <button class="win-btn" onclick="aceptar()">Acepto</button>
+      <button class="win-btn" id="btn-no" onmouseenter="escapar()">No acepto</button>
+    </div>
+  </div>
+</div>
+ 
+<!-- CELEBRACIÓN -->
+<div id="celebracion">
+  <p class="celeb-titulo">¡Felicidades! 🌷<br><em>Joseph y tú ahora son enamorados</em> 💗</p>
+  <p class="celeb-sub">Un momento para recordar siempre</p>
+  <p class="celeb-fecha" id="fecha-hora"></p>
+</div>
+ 
+<script>
+  // ── CUENTA REGRESIVA ──
+  let cuenta = 10;
+  const numEl = document.getElementById('numero');
+ 
+  const intervalo = setInterval(() => {
+    numEl.classList.add('pulso');
+    setTimeout(() => numEl.classList.remove('pulso'), 120);
+    cuenta--;
+    if (cuenta > 0) {
+      numEl.textContent = cuenta;
+    } else {
+      clearInterval(intervalo);
+      numEl.textContent = '✦';
+      setTimeout(mostrarVentana, 600);
+    }
+  }, 1000);
+ 
+  // ── MOSTRAR VENTANA ──
+  function mostrarVentana() {
+    const ventana = document.getElementById('ventana');
+    document.getElementById('overlay').style.display = 'block';
+    ventana.style.display = 'block';
+    ventana.classList.add('ventana-show');
+    ventana.style.transition = 'none';
+    ventana.style.left = ((window.innerWidth  - 360) / 2) + 'px';
+    ventana.style.top  = ((window.innerHeight - 240) / 2) + 'px';
+  }
+ 
+  // ── ESCAPAR al hacer hover sobre "No acepto" ──
+  function escapar() {
+    const v = document.getElementById('ventana');
+    const margen = 20;
+    const maxX = window.innerWidth  - 360 - margen;
+    const maxY = window.innerHeight - 240 - margen;
+ 
+    // Evitar que la nueva posición sea la misma zona
+    let newX, newY;
+    const currentX = parseFloat(v.style.left) || 0;
+    const currentY = parseFloat(v.style.top)  || 0;
+ 
+    do {
+      newX = margen + Math.random() * maxX;
+      newY = margen + Math.random() * maxY;
+    } while (Math.abs(newX - currentX) < 80 && Math.abs(newY - currentY) < 80);
+ 
+    v.style.transition = 'left 0.22s cubic-bezier(0.34,1.6,0.64,1), top 0.22s cubic-bezier(0.34,1.6,0.64,1)';
+    v.style.left = newX + 'px';
+    v.style.top  = newY + 'px';
+  }
+ 
+  // ── ACEPTAR ──
+  function aceptar() {
+    document.getElementById('ventana').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
+    document.getElementById('pantalla-principal').style.display = 'none';
+ 
+    const celeb = document.getElementById('celebracion');
+    celeb.style.display = 'flex';
+ 
+    const ahora = new Date();
+    const fecha = ahora.toLocaleDateString('es-PE', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    const hora  = ahora.toLocaleTimeString('es-PE', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    document.getElementById('fecha-hora').textContent =
+      fecha.charAt(0).toUpperCase() + fecha.slice(1) + '  ·  ' + hora;
+ 
+    lanzarTulipanes();
+    setTimeout(lanzarTulipanes, 1800);
+    setTimeout(lanzarTulipanes, 3400);
+  }
+ 
+  // ── TULIPANES ──
+  const emojis = ['🌷','🌸','🌺','💐','🌼','🌹','✨','🍃','💗','🫧','🕊️'];
+ 
+  function lanzarTulipanes() {
+    for (let i = 0; i < 22; i++) {
+      setTimeout(() => {
+        const el = document.createElement('div');
+        el.className = 'tulipan';
+        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        el.style.left = (Math.random() * 100) + 'vw';
+        el.style.fontSize = (1.2 + Math.random() * 1.8) + 'rem';
+        const dur = 3.5 + Math.random() * 2.5;
+        el.style.animationDuration = dur + 's';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), dur * 1000 + 200);
+      }, i * 65);
+    }
+  }
+</script>
+</body>
+</html>
